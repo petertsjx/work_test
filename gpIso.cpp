@@ -820,34 +820,39 @@ void gpIsoGroup::PlaceIsocells(){
     int penalty =UTMAX(GetW2(),GetH1())<< 2;
     gpIsoCellIter iter;
     gpIsoCell *cell;
+    for(iter.Begin(this);!iter.End(cell);iter++){
+        int minCost=INT_MAX;
+        int minRow=-1;
+        int x,y;
 
-    for(intr=0;r<maxRow;r++){
-        int maxWidth =(r<minRow)? GetMaxWidth():GetMinWidth();
-        x=GetX()+GetDirx()*pos[r];
-        y=GetY()+GetDirY()*r*h;
-        int cost=2*GetPoint()->GetXyDistance(x,y)+cell->GetLoc()->GetXyDistance(x,y);
-        if(pos[r] >=maxWidth){
-            cost +=penalty;
+        for(int r=0;r<maxRow;r++){
+            int maxWidth =(r<minRow)? GetMaxWidth():GetMinWidth();
+            x=GetX()+GetDirx()*pos[r];
+            y=GetY()+GetDirY()*r*h;
+            int cost=2*GetPoint()->GetXyDistance(x,y)+cell->GetLoc()->GetXyDistance(x,y);
+            if(pos[r] >=maxWidth){
+                cost +=penalty;
+            }
+            if(cost<mincost){
+                minCost=cost;
+                minRow=r;
+            }
         }
-        if(cost<mincost){
-            minCost=cost;
-            minRow=r;
-        }
-    }
-    guPoint pt;
-    x=GetX()+GetDirX()*(pos[minRow]+cell->GetPlWidth()/2);
-    y=GetY()+GetDirY()*(minRow*h+h/2);
-    pt.Set(x,y);
+        guPoint pt;
+        x=GetX()+GetDirX()*(pos[minRow]+cell->GetPlWidth()/2);
+        y=GetY()+GetDirY()*(minRow*h+h/2);
+        pt.Set(x,y);
 
-    pu::GetInst(cell->GetInst())->Shift(&pt);
-    if(cell->GetHeight()== 1){
-        pos[minRow]+= cell->GetWidth();
-    } else {
-        if(minRow +cell->GetHeight()>=maxRow){
-            minRow=maxRow-cell->GetHeight();
-        }
-        for(int i=0;i<cell->GetHeight();i++){
-            pos[minRow + i]+= cell->GetWidth();
+        pu::GetInst(cell->GetInst())->Shift(&pt);
+        if(cell->GetHeight()== 1){
+            pos[minRow]+= cell->GetWidth();
+        } else {
+            if(minRow +cell->GetHeight()>=maxRow){
+                minRow=maxRow-cell->GetHeight();
+            }
+            for(int i=0;i<cell->GetHeight();i++){
+                pos[minRow + i]+= cell->GetWidth();
+            }
         }
     }
 }
