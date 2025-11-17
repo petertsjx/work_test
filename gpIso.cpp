@@ -10,13 +10,13 @@ gpIsoMgr::~gpIsoMgr(){
     RecycleIsoGroups();
     delete GetIsoGroupList();
     delete _pool;
-    if（blkBin）{
+    if(blkBin){
         delete blkBin;
     }
 }
 
 void gpIsoMgr::Init(){
-    _pool=new utMemPool("gpIsoMgr");
+    _pool  =new utMemPool("gpIsoMgr");
     lePool=_pool->NewobjPool(sizeof(utSListEntry));
     isoCellPool=_pool->NewobjPool(sizeof(gpIsoCell));
     isoGrpPool =_pool->NewObjPool(sizeof(gpIsoGroup));
@@ -897,6 +897,13 @@ void gpIsoGroup::GetRectList(guRectList *bndy)const {
 }
 
 void gpIsoGroup::GetBlockageBoxl(guRect *bbox) const {
+    bbox->SetPoint(GetPoint());
+    int x2=GetX()-GetDirX()* GetWl();
+    int y2 = GetY()+ GetDirY()*GetH1();
+    bbox->Expand(x2,y2);
+}
+
+void gpIsoGroup::GetBlockageBox2(guRect *bbox) const {
     bbox->SetPoint(GetPoint());
     int x2=GetX()-GetDirX()* GetWl();
     int y2 = GetY()+ GetDirY()*GetH1();
